@@ -79,21 +79,28 @@ const start = async () => {
     await connectDB()
     await seedCategories()
 
-    // Auto-create admin from env if not exists
+    // Auto-create / sync admin from env
     const adminEmail = process.env.SEED_ADMIN_EMAIL
     const adminPassword = process.env.SEED_ADMIN_PASSWORD
     if (adminEmail && adminPassword) {
-      const existing = await User.findOne({ role: 'admin' })
-      if (!existing) {
-        await User.create({
-          name: 'Admin',
-          email: adminEmail,
-          password: adminPassword,
-          role: 'admin',
-        })
-        console.log(`✅ Admin created: ${adminEmail}`)
+      let admin = await User.findOne({ email: adminEmail })
+      if (!admin) {
+        // No user with this email — check if another admin exists and update it
+        const existingAdmin = await User.findOne({ role: 'admin' })
+        if (existingAdmin) {
+          existingAdmin.email = adminEmail
+          existingAdmin.password = adminPassword
+          await existingAdmin.save()
+          console.log(`✅ Admin credentials synced to: ${adminEmail}`)
+        } else {
+          await User.create({ name: 'Admin', email: adminEmail, password: adminPassword, role: 'admin' })
+          console.log(`✅ Admin created: ${adminEmail}`)
+        }
       } else {
-        console.log(`ℹ️  Admin already exists: ${existing.email}`)
+        // Admin exists with this email — sync password
+        admin.password = adminPassword
+        await admin.save()
+        console.log(`✅ Admin password synced: ${adminEmail}`)
       }
     }
 
