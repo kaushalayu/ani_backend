@@ -11,6 +11,17 @@ const getDefaultSeo = () => ({
   ogTitle: '',
   ogDescription: '',
   footerText: '',
+  whatsappNumber: '61383766284',
+  supportEmail: 'support@pharmez.com',
+  contactPhone: '+61 3 8376 6284',
+  address: '21 King Street, Melbourne, 3000, Australia',
+  businessHours: 'Mon - Sat: 9:00 am to 6:00 pm',
+  socialLinks: {
+    facebook: 'https://www.facebook.com/',
+    instagram: 'https://instagram.com/',
+    linkedin: 'https://www.linkedin.com/',
+  },
+  mapEmbedUrl: '',
 })
 
 // @desc    Get SEO settings (public)
@@ -33,7 +44,11 @@ const getSeo = async (req, res, next) => {
 // @access  Admin
 const updateSeo = async (req, res, next) => {
   try {
-    const { siteTitle, siteDescription, siteKeywords, ogTitle, ogDescription, footerText } = req.body
+    const {
+      siteTitle, siteDescription, siteKeywords, ogTitle, ogDescription, footerText,
+      whatsappNumber, supportEmail, contactPhone, address, businessHours,
+      socialLinks, mapEmbedUrl,
+    } = req.body
 
     let seo = await Seo.findOne()
     if (!seo) {
@@ -46,6 +61,17 @@ const updateSeo = async (req, res, next) => {
     if (ogTitle !== undefined) seo.ogTitle = ogTitle
     if (ogDescription !== undefined) seo.ogDescription = ogDescription
     if (footerText !== undefined) seo.footerText = footerText
+    if (whatsappNumber !== undefined) seo.whatsappNumber = whatsappNumber
+    if (supportEmail !== undefined) seo.supportEmail = supportEmail
+    if (contactPhone !== undefined) seo.contactPhone = contactPhone
+    if (address !== undefined) seo.address = address
+    if (businessHours !== undefined) seo.businessHours = businessHours
+    if (mapEmbedUrl !== undefined) seo.mapEmbedUrl = mapEmbedUrl
+    if (socialLinks !== undefined) {
+      if (socialLinks.facebook !== undefined) seo.socialLinks.facebook = socialLinks.facebook
+      if (socialLinks.instagram !== undefined) seo.socialLinks.instagram = socialLinks.instagram
+      if (socialLinks.linkedin !== undefined) seo.socialLinks.linkedin = socialLinks.linkedin
+    }
 
     await seo.save()
 
@@ -69,7 +95,6 @@ const uploadIcon = async (req, res, next) => {
       seo = new Seo()
     }
 
-    // Delete old icon file if exists
     if (seo.siteIcon) {
       const oldPath = path.resolve(__dirname, '../../', seo.siteIcon)
       if (oldPath.startsWith(path.resolve(__dirname, '../../uploads'))) {
