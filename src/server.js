@@ -7,6 +7,7 @@ const path    = require('path')
 const connectDB        = require('./config/db')
 const errorHandler     = require('./middleware/errorHandler')
 const seedCategories   = require('./utils/seedCategories')
+const User             = require('./models/User')
 
 const app = express()
 
@@ -38,7 +39,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 // ── API Routes ─────────────────────────────────────────
-app.use('/api/setup',      require('./routes/setupRoutes'))
 app.use('/api/auth',       require('./routes/authRoutes'))
 app.use('/api/products',   require('./routes/productRoutes'))
 app.use('/api/categories', require('./routes/categoryRoutes'))
@@ -77,13 +77,29 @@ const PORT = process.env.PORT || 5000
 const start = async () => {
   try {
     await connectDB()
-    await seedCategories()           // Auto-create default categories if missing
+    await seedCategories()
+
+    // Auto-create admin from env if not exists
+    const adminEmail = process.env.SEED_ADMIN_EMAIL
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD
+    if (adminEmail && adminPassword) {
+      const existing = await User.findOne({ role: 'admin' })
+      if (!existing) {
+        await User.create({
+          name: 'Admin',
+          email: adminEmail,
+          password: adminPassword,
+          role: 'admin',
+        })
+        console.log(`✅ Admin created: ${adminEmail}`)
+      } else {
+        console.log(`ℹ️  Admin already exists: ${existing.email}`)
+      }
+    }
 
     app.listen(PORT, () => {
       console.log(`\n🚀 Server running on http://localhost:${PORT}`)
-      console.log(`📦 Environment: ${process.env.NODE_ENV}`)
-      console.log(`\n📋 Admin Setup: POST http://localhost:${PORT}/api/setup/create-admin`)
-      console.log(`📋 Check Status: GET  http://localhost:${PORT}/api/setup/status\n`)
+      console.log(`📦 Environment: ${process.env.NODE_ENV}\n`)
     })
   } catch (err) {
     console.error('❌ Failed to start server:', err.message)
