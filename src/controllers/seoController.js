@@ -71,9 +71,11 @@ const uploadIcon = async (req, res, next) => {
 
     // Delete old icon file if exists
     if (seo.siteIcon) {
-      const oldPath = path.join(__dirname, '../../', seo.siteIcon)
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath)
+      const oldPath = path.resolve(__dirname, '../../', seo.siteIcon)
+      if (oldPath.startsWith(path.resolve(__dirname, '../../uploads'))) {
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath)
+        }
       }
     }
 
@@ -101,9 +103,11 @@ const uploadOgImage = async (req, res, next) => {
     }
 
     if (seo.ogImage) {
-      const oldPath = path.join(__dirname, '../../', seo.ogImage)
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath)
+      const oldPath = path.resolve(__dirname, '../../', seo.ogImage)
+      if (oldPath.startsWith(path.resolve(__dirname, '../../uploads'))) {
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath)
+        }
       }
     }
 

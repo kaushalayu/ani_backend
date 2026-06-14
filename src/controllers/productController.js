@@ -19,7 +19,8 @@ const getProducts = async (req, res, next) => {
       limit = 12,
     } = req.query
 
-    const query = { isActive: true }
+    const isAdminRequest = req.user?.role === 'admin'
+    const query = isAdminRequest ? {} : { isActive: true }
 
     if (search) {
       query.$or = [
@@ -84,7 +85,13 @@ const getProduct = async (req, res, next) => {
       product = await Product.findOne({ slug: id }).populate('category', 'name slug')
     }
 
-    if (!product || !product.isActive) {
+    // Admin can view inactive products (for editing in admin panel)
+    // Regular users only see active products
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' })
+    }
+
+    if (!product.isActive && req.user?.role !== 'admin') {
       return res.status(404).json({ success: false, message: 'Product not found' })
     }
 
@@ -108,27 +115,32 @@ const createProduct = async (req, res, next) => {
       image: imageUrl,
     }
 
-    // Parse JSON fields if they come as strings (from FormData)
-    if (typeof productData.pillsOptions === 'string') {
-      productData.pillsOptions = JSON.parse(productData.pillsOptions)
-    }
-    if (typeof productData.tags === 'string') {
-      productData.tags = JSON.parse(productData.tags)
-    }
-    if (typeof productData.hasPillsOptions === 'string') {
-      productData.hasPillsOptions = productData.hasPillsOptions === 'true'
-    }
-    if (typeof productData.isFeatured === 'string') {
-      productData.isFeatured = productData.isFeatured === 'true'
-    }
-    if (typeof productData.isNewArrival === 'string') {
-      productData.isNewArrival = productData.isNewArrival === 'true'
-    }
-    if (typeof productData.isBestSeller === 'string') {
-      productData.isBestSeller = productData.isBestSeller === 'true'
+    const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'images']
+    const filteredData = {}
+    for (const key of safeFields) {
+      if (productData[key] !== undefined) filteredData[key] = productData[key]
     }
 
-    const product = await Product.create(productData)
+    if (typeof filteredData.pillsOptions === 'string') {
+      try { filteredData.pillsOptions = JSON.parse(filteredData.pillsOptions) } catch { return res.status(400).json({ success: false, message: 'Invalid pillsOptions format' }) }
+    }
+    if (typeof filteredData.tags === 'string') {
+      try { filteredData.tags = JSON.parse(filteredData.tags) } catch { return res.status(400).json({ success: false, message: 'Invalid tags format' }) }
+    }
+    if (typeof filteredData.hasPillsOptions === 'string') {
+      filteredData.hasPillsOptions = filteredData.hasPillsOptions === 'true'
+    }
+    if (typeof filteredData.isFeatured === 'string') {
+      filteredData.isFeatured = filteredData.isFeatured === 'true'
+    }
+    if (typeof filteredData.isNewArrival === 'string') {
+      filteredData.isNewArrival = filteredData.isNewArrival === 'true'
+    }
+    if (typeof filteredData.isBestSeller === 'string') {
+      filteredData.isBestSeller = filteredData.isBestSeller === 'true'
+    }
+
+    const product = await Product.create(filteredData)
     const populated = await product.populate('category', 'name slug')
 
     res.status(201).json({ success: true, message: 'Product created', product: populated })
@@ -153,20 +165,25 @@ const updateProduct = async (req, res, next) => {
       updateData.image = `/uploads/${req.file.filename}`
     }
 
-    // Parse JSON fields
-    if (typeof updateData.pillsOptions === 'string') {
-      updateData.pillsOptions = JSON.parse(updateData.pillsOptions)
+    const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'images']
+    const filteredUpdate = {}
+    for (const key of safeFields) {
+      if (updateData[key] !== undefined) filteredUpdate[key] = updateData[key]
     }
-    if (typeof updateData.tags === 'string') {
-      updateData.tags = JSON.parse(updateData.tags)
+
+    if (typeof filteredUpdate.pillsOptions === 'string') {
+      try { filteredUpdate.pillsOptions = JSON.parse(filteredUpdate.pillsOptions) } catch { return res.status(400).json({ success: false, message: 'Invalid pillsOptions format' }) }
+    }
+    if (typeof filteredUpdate.tags === 'string') {
+      try { filteredUpdate.tags = JSON.parse(filteredUpdate.tags) } catch { return res.status(400).json({ success: false, message: 'Invalid tags format' }) }
     }
     ;['hasPillsOptions', 'isFeatured', 'isNewArrival', 'isBestSeller', 'isActive'].forEach((key) => {
-      if (typeof updateData[key] === 'string') {
-        updateData[key] = updateData[key] === 'true'
+      if (typeof filteredUpdate[key] === 'string') {
+        filteredUpdate[key] = filteredUpdate[key] === 'true'
       }
     })
 
-    const updated = await Product.findByIdAndUpdate(req.params.id, updateData, {
+    const updated = await Product.findByIdAndUpdate(req.params.id, filteredUpdate, {
       new: true,
       runValidators: true,
     }).populate('category', 'name slug')
@@ -206,6 +223,11 @@ const addReview = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' })
     }
 
+    const ratingNum = Number(rating)
+    if (!rating || isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+      return res.status(400).json({ success: false, message: 'Rating must be a number between 1 and 5' })
+    }
+
     const alreadyReviewed = product.reviews.find(
       (r) => r.user.toString() === req.user._id.toString()
     )
@@ -217,7 +239,7 @@ const addReview = async (req, res, next) => {
     const review = {
       user: req.user._id,
       name: req.user.name,
-      rating: Number(rating),
+      rating: ratingNum,
       comment,
     }
 

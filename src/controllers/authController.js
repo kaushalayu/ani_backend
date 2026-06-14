@@ -51,7 +51,14 @@ const login = async (req, res, next) => {
     // Include password field (it's select: false by default)
     const user = await User.findOne({ email }).select('+password')
 
-    if (!user || !(await user.matchPassword(password))) {
+    if (!user) {
+      console.log(`[LOGIN FAIL] No user found for email: ${email}`)
+      return res.status(401).json({ success: false, message: 'Invalid email or password' })
+    }
+
+    const isMatch = await user.matchPassword(password)
+    if (!isMatch) {
+      console.log(`[LOGIN FAIL] Wrong password for email: ${email}`)
       return res.status(401).json({ success: false, message: 'Invalid email or password' })
     }
 

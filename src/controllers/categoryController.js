@@ -5,7 +5,9 @@ const Category = require('../models/Category')
 // @access  Public
 const getCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find({ isActive: true }).sort({ name: 1 })
+    const isAdminRequest = req.user?.role === 'admin'
+    const query = isAdminRequest ? {} : { isActive: true }
+    const categories = await Category.find(query).sort({ name: 1 })
     res.json({ success: true, categories })
   } catch (error) {
     next(error)

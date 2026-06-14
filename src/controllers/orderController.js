@@ -136,8 +136,9 @@ const getDashboardStats = async (req, res, next) => {
   try {
     const User = require('../models/User')
     const Product = require('../models/Product')
+    const Contact = require('../models/Contact')
 
-    const [totalOrders, totalUsers, totalProducts, pendingOrders, deliveredOrders, revenueResult] =
+    const [totalOrders, totalUsers, totalProducts, pendingOrders, deliveredOrders, revenueResult, contactCount, unreadContactCount] =
       await Promise.all([
         Order.countDocuments(),
         User.countDocuments({ role: 'user' }),
@@ -148,6 +149,8 @@ const getDashboardStats = async (req, res, next) => {
           { $match: { orderStatus: { $ne: 'cancelled' } } },
           { $group: { _id: null, total: { $sum: '$totalPrice' } } },
         ]),
+        Contact.countDocuments(),
+        Contact.countDocuments({ isRead: false }),
       ])
 
     const totalRevenue = revenueResult[0]?.total || 0
@@ -167,6 +170,8 @@ const getDashboardStats = async (req, res, next) => {
         pendingOrders,
         deliveredOrders,
         totalRevenue,
+        contactCount,
+        unreadContactCount,
       },
       recentOrders,
     })

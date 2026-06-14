@@ -8,12 +8,12 @@ const {
   deleteProduct,
   addReview,
 } = require('../controllers/productController')
-const { protect, adminOnly } = require('../middleware/auth')
+const { protect, adminOnly, optionalAuth } = require('../middleware/auth')
 const upload = require('../utils/upload')
 
-// Public
-router.get('/', getProducts)
-router.get('/:id', getProduct)
+// Public (with optional auth for admin visibility)
+router.get('/', optionalAuth, getProducts)
+router.get('/:id', optionalAuth, getProduct)
 
 // Private
 router.post('/:id/reviews', protect, addReview)

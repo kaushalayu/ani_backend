@@ -6,7 +6,6 @@ const {
   getOrder,
   getAllOrders,
   updateOrderStatus,
-  getDashboardStats,
 } = require('../controllers/orderController')
 const { protect, adminOnly } = require('../middleware/auth')
 
@@ -17,7 +16,7 @@ router.get('/:id', protect, getOrder)
 
 // Admin
 router.get('/', protect, adminOnly, getAllOrders)
-router.get('/admin/stats', protect, adminOnly, getDashboardStats)
+// Note: /admin/stats is in adminRoutes.js — this duplicate is removed
 router.put('/:id/status', protect, adminOnly, updateOrderStatus)
 
 module.exports = router

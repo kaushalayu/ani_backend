@@ -1,17 +1,16 @@
 require('dotenv').config()
 const express = require('express')
-const cors = require('cors')
-const morgan = require('morgan')
-const path = require('path')
-const connectDB = require('./config/db')
-const errorHandler = require('./middleware/errorHandler')
+const cors    = require('cors')
+const morgan  = require('morgan')
+const path    = require('path')
 
-// Connect to MongoDB
-connectDB()
+const connectDB        = require('./config/db')
+const errorHandler     = require('./middleware/errorHandler')
+const seedCategories   = require('./utils/seedCategories')
 
 const app = express()
 
-// Middleware
+// ── Middleware ─────────────────────────────────────────
 const allowedOrigins = [
   process.env.CLIENT_URL,
   'http://localhost:5173',
@@ -20,15 +19,14 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, cb) => {
-    // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return cb(null, true)
     if (allowedOrigins.includes(origin)) return cb(null, true)
-    // Allow any sub-origin on localhost for dev
     if (origin.startsWith('http://localhost:')) return cb(null, true)
     cb(null, false)
   },
   credentials: true,
 }))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -36,36 +34,61 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
-// Serve uploaded images as static files
+// ── Static uploads ─────────────────────────────────────
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
-// ─── API Routes ───────────────────────────────────────────
-app.use('/api/setup', require('./routes/setupRoutes'))       // First-time admin setup
-app.use('/api/auth', require('./routes/authRoutes'))
-app.use('/api/products', require('./routes/productRoutes'))
+// ── API Routes ─────────────────────────────────────────
+app.use('/api/setup',      require('./routes/setupRoutes'))
+app.use('/api/auth',       require('./routes/authRoutes'))
+app.use('/api/products',   require('./routes/productRoutes'))
 app.use('/api/categories', require('./routes/categoryRoutes'))
-app.use('/api/orders', require('./routes/orderRoutes'))
-app.use('/api/blogs', require('./routes/blogRoutes'))        // Blog
-app.use('/api/seo', require('./routes/seoRoutes'))           // SEO (public)
-app.use('/api/admin', require('./routes/adminRoutes'))
+app.use('/api/orders',     require('./routes/orderRoutes'))
+app.use('/api/blogs',      require('./routes/blogRoutes'))
+app.use('/api/seo',        require('./routes/seoRoutes'))
+app.use('/api/contact',      require('./routes/contactRoutes'))
+app.use('/api/testimonials', require('./routes/testimonialRoutes'))
+app.use('/api/faqs',         require('./routes/faqRoutes'))
+app.use('/api/team',         require('./routes/teamRoutes'))
+app.use('/api/services',     require('./routes/serviceRoutes'))
+app.use('/api/admin',        require('./routes/adminRoutes'))
+app.use('/api/newsletter',   require('./routes/newsletterRoutes'))
 
-// Health check
+// Debug routes — development only (NEVER in production)
+if (process.env.NODE_ENV === 'development') {
+  app.use('/api/debug', require('./routes/debugRoutes'))
+}
+
+// ── Health check ───────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Pharmez API is running 🚀', env: process.env.NODE_ENV })
 })
 
-// 404 handler
+// ── 404 ────────────────────────────────────────────────
 app.use('*', (req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` })
 })
 
-// Global error handler
+// ── Global error handler ───────────────────────────────
 app.use(errorHandler)
 
+// ── Start server AFTER DB connects ────────────────────
 const PORT = process.env.PORT || 5000
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
-  console.log(`📦 Environment: ${process.env.NODE_ENV}`)
-  console.log(`\n📋 Setup Admin: POST http://localhost:${PORT}/api/setup/create-admin`)
-  console.log(`📋 Check Status: GET  http://localhost:${PORT}/api/setup/status\n`)
-})
+
+const start = async () => {
+  try {
+    await connectDB()
+    await seedCategories()           // Auto-create default categories if missing
+
+    app.listen(PORT, () => {
+      console.log(`\n🚀 Server running on http://localhost:${PORT}`)
+      console.log(`📦 Environment: ${process.env.NODE_ENV}`)
+      console.log(`\n📋 Admin Setup: POST http://localhost:${PORT}/api/setup/create-admin`)
+      console.log(`📋 Check Status: GET  http://localhost:${PORT}/api/setup/status\n`)
+    })
+  } catch (err) {
+    console.error('❌ Failed to start server:', err.message)
+    process.exit(1)
+  }
+}
+
+start()

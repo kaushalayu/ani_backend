@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const { getCategories, createCategory, updateCategory, deleteCategory } = require('../controllers/categoryController')
-const { protect, adminOnly } = require('../middleware/auth')
+const { protect, adminOnly, optionalAuth } = require('../middleware/auth')
 const upload = require('../utils/upload')
 
-router.get('/', getCategories)
+router.get('/', optionalAuth, getCategories)
 router.post('/', protect, adminOnly, upload.single('image'), createCategory)
 router.put('/:id', protect, adminOnly, upload.single('image'), updateCategory)
 router.delete('/:id', protect, adminOnly, deleteCategory)
