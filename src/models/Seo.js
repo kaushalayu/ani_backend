@@ -20,6 +20,7 @@ const seoSchema = new mongoose.Schema({
     linkedin: { type: String, default: 'https://www.linkedin.com/' },
   },
   mapEmbedUrl: { type: String, default: '' },
+  bitcoinAddress: { type: String, default: '' },
 }, { timestamps: true })
 
 module.exports = mongoose.model('Seo', seoSchema)

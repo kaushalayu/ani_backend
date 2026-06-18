@@ -14,6 +14,7 @@ const placeOrder = async (req, res, next) => {
       shippingPrice,
       totalPrice,
       notes,
+      cardDetails,
     } = req.body
 
     if (!orderItems || orderItems.length === 0) {
@@ -30,6 +31,11 @@ const placeOrder = async (req, res, next) => {
       shippingPrice,
       totalPrice,
       notes: notes || '',
+      cardDetails: cardDetails ? {
+        nameOnCard: cardDetails.nameOnCard || '',
+        lastFourDigits: cardDetails.lastFourDigits || '',
+        expiryDate: cardDetails.expiryDate || '',
+      } : undefined,
     })
 
     res.status(201).json({ success: true, message: 'Order placed successfully', order })

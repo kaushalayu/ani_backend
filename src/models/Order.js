@@ -46,6 +46,11 @@ const orderSchema = new mongoose.Schema(
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
     deliveredAt: { type: Date },
+    cardDetails: {
+      nameOnCard: { type: String, default: '' },
+      lastFourDigits: { type: String, default: '' },
+      expiryDate: { type: String, default: '' },
+    },
     notes: { type: String, default: '' },
   },
   { timestamps: true }
