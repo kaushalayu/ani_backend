@@ -115,7 +115,7 @@ const createProduct = async (req, res, next) => {
       image: imageUrl,
     }
 
-    const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'images']
+    const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'image', 'images']
     const filteredData = {}
     for (const key of safeFields) {
       if (productData[key] !== undefined) filteredData[key] = productData[key]
@@ -165,7 +165,7 @@ const updateProduct = async (req, res, next) => {
       updateData.image = `/uploads/${req.file.filename}`
     }
 
-    const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'images']
+    const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'image', 'images']
     const filteredUpdate = {}
     for (const key of safeFields) {
       if (updateData[key] !== undefined) filteredUpdate[key] = updateData[key]
