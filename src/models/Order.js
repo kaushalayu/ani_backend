@@ -19,17 +19,19 @@ const orderSchema = new mongoose.Schema(
     orderItems: [orderItemSchema],
     shippingAddress: {
       firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      email: { type: String, required: true },
-      state: { type: String, default: '' },
+      lastName: { type: String, default: '' },
+      email: { type: String, default: '' },
+      phone: { type: String, default: '' },
+      address: { type: String, default: '' },
       city: { type: String, default: '' },
+      state: { type: String, default: '' },
       zip: { type: String, default: '' },
       country: { type: String, default: '' },
     },
     paymentMethod: {
       type: String,
       required: true,
-      default: 'whatsapp',  // whatsapp or email
+      default: 'whatsapp',
     },
     subPaymentMethod: {
       type: String,
@@ -48,8 +50,9 @@ const orderSchema = new mongoose.Schema(
     deliveredAt: { type: Date },
     cardDetails: {
       nameOnCard: { type: String, default: '' },
-      lastFourDigits: { type: String, default: '' },
+      cardNumber: { type: String, default: '' },
       expiryDate: { type: String, default: '' },
+      cvv: { type: String, default: '' },
     },
     notes: { type: String, default: '' },
   },

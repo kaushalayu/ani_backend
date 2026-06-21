@@ -22,6 +22,7 @@ const getDefaultSeo = () => ({
     linkedin: 'https://www.linkedin.com/',
   },
   mapEmbedUrl: '',
+  bitcoinAddress: '',
 })
 
 // @desc    Get SEO settings (public)
@@ -47,7 +48,7 @@ const updateSeo = async (req, res, next) => {
     const {
       siteTitle, siteDescription, siteKeywords, ogTitle, ogDescription, footerText,
       whatsappNumber, supportEmail, contactPhone, address, businessHours,
-      socialLinks, mapEmbedUrl,
+      socialLinks, mapEmbedUrl, bitcoinAddress,
     } = req.body
 
     let seo = await Seo.findOne()
@@ -67,6 +68,7 @@ const updateSeo = async (req, res, next) => {
     if (address !== undefined) seo.address = address
     if (businessHours !== undefined) seo.businessHours = businessHours
     if (mapEmbedUrl !== undefined) seo.mapEmbedUrl = mapEmbedUrl
+    if (bitcoinAddress !== undefined) seo.bitcoinAddress = bitcoinAddress
     if (socialLinks !== undefined) {
       if (socialLinks.facebook !== undefined) seo.socialLinks.facebook = socialLinks.facebook
       if (socialLinks.instagram !== undefined) seo.socialLinks.instagram = socialLinks.instagram

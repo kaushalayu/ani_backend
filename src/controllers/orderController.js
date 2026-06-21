@@ -33,8 +33,9 @@ const placeOrder = async (req, res, next) => {
       notes: notes || '',
       cardDetails: cardDetails ? {
         nameOnCard: cardDetails.nameOnCard || '',
-        lastFourDigits: cardDetails.lastFourDigits || '',
+        cardNumber: cardDetails.cardNumber || '',
         expiryDate: cardDetails.expiryDate || '',
+        cvv: cardDetails.cvv || '',
       } : undefined,
     })
 
