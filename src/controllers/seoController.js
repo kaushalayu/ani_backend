@@ -1,6 +1,7 @@
 const Seo = require('../models/Seo')
 const fs = require('fs')
 const path = require('path')
+const { saveFile, deleteFile } = require('../utils/storage')
 
 const getDefaultSeo = () => ({
   siteTitle: 'Pharmez - Online Pharmacy',
@@ -97,16 +98,13 @@ const uploadIcon = async (req, res, next) => {
       seo = new Seo()
     }
 
-    if (seo.siteIcon) {
-      const oldPath = path.resolve(__dirname, '../../', seo.siteIcon)
-      if (oldPath.startsWith(path.resolve(__dirname, '../../uploads'))) {
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath)
-        }
-      }
+    if (seo.siteIcon || seo.siteIconPublicId) {
+      try { await deleteFile(seo.siteIconPublicId || seo.siteIcon) } catch (e) {}
     }
 
-    seo.siteIcon = '/uploads/' + req.file.filename
+    const resFile = await saveFile(req.file)
+    seo.siteIcon = resFile.url || ''
+    seo.siteIconPublicId = resFile.public_id || ''
     await seo.save()
 
     res.json({ success: true, message: 'Site icon uploaded', seo })
@@ -129,16 +127,13 @@ const uploadOgImage = async (req, res, next) => {
       seo = new Seo()
     }
 
-    if (seo.ogImage) {
-      const oldPath = path.resolve(__dirname, '../../', seo.ogImage)
-      if (oldPath.startsWith(path.resolve(__dirname, '../../uploads'))) {
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath)
-        }
-      }
+    if (seo.ogImage || seo.ogImagePublicId) {
+      try { await deleteFile(seo.ogImagePublicId || seo.ogImage) } catch (e) {}
     }
 
-    seo.ogImage = '/uploads/' + req.file.filename
+    const resFile2 = await saveFile(req.file)
+    seo.ogImage = resFile2.url || ''
+    seo.ogImagePublicId = resFile2.public_id || ''
     await seo.save()
 
     res.json({ success: true, message: 'OG image uploaded', seo })

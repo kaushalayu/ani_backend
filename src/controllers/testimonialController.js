@@ -1,4 +1,5 @@
 const Testimonial = require('../models/Testimonial')
+const { saveFile, deleteFile } = require('../utils/storage')
 
 const getTestimonials = async (req, res, next) => {
   try {
@@ -22,8 +23,14 @@ const getTestimonial = async (req, res, next) => {
 
 const createTestimonial = async (req, res, next) => {
   try {
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image || ''
-    const testimonial = await Testimonial.create({ ...req.body, image: imageUrl })
+    let imageUrl = req.body.image || ''
+    let imagePublicId = ''
+    if (req.file) {
+      const resFile = await saveFile(req.file)
+      imageUrl = resFile.url || ''
+      imagePublicId = resFile.public_id || ''
+    }
+    const testimonial = await Testimonial.create({ ...req.body, image: imageUrl, imagePublicId })
     res.status(201).json({ success: true, message: 'Testimonial created', testimonial })
   } catch (error) {
     next(error)
@@ -36,7 +43,12 @@ const updateTestimonial = async (req, res, next) => {
     if (!testimonial) return res.status(404).json({ success: false, message: 'Testimonial not found' })
 
     const updateData = { ...req.body }
-    if (req.file) updateData.image = `/uploads/${req.file.filename}`
+    if (req.file) {
+      try { await deleteFile(testimonial.imagePublicId || testimonial.image) } catch (e) {}
+      const resFile = await saveFile(req.file)
+      updateData.image = resFile.url || ''
+      if (resFile.public_id) updateData.imagePublicId = resFile.public_id
+    }
     if (typeof updateData.isActive === 'string') {
       updateData.isActive = updateData.isActive === 'true'
     }

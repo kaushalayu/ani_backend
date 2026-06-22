@@ -56,6 +56,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Product image is required'],
     },
+    imagePublicId: { type: String, default: '' },
     // Extra images
     images: [{ type: String }],
     // Pricing — either simple or pills-based

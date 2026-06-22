@@ -1,4 +1,5 @@
 const Product = require('../models/Product')
+const { saveFile, deleteFile } = require('../utils/storage')
 
 // @desc    Get all products (with filters, search, pagination)
 // @route   GET /api/products
@@ -106,13 +107,18 @@ const getProduct = async (req, res, next) => {
 // @access  Admin
 const createProduct = async (req, res, next) => {
   try {
-    const imageUrl = req.file
-      ? `/uploads/${req.file.filename}`
-      : req.body.image || ''
+    let imageUrl = req.body.image || ''
+    let imagePublicId = ''
+    if (req.file) {
+      const resFile = await saveFile(req.file)
+      imageUrl = resFile.url || ''
+      imagePublicId = resFile.public_id || ''
+    }
 
     const productData = {
       ...req.body,
       image: imageUrl,
+      imagePublicId,
     }
 
     const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'image', 'images']
@@ -162,7 +168,11 @@ const updateProduct = async (req, res, next) => {
     const updateData = { ...req.body }
 
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`
+      // delete previous image if any
+      try { await deleteFile(product.imagePublicId || product.image) } catch (e) {}
+      const resFile = await saveFile(req.file)
+      updateData.image = resFile.url || ''
+      if (resFile.public_id) updateData.imagePublicId = resFile.public_id
     }
 
     const safeFields = ['name', 'description', 'shortDescription', 'badge', 'tags', 'price', 'oldPrice', 'stock', 'isFeatured', 'isNewArrival', 'isBestSeller', 'hasPillsOptions', 'pillsOptions', 'howToUse', 'sideEffects', 'ingredients', 'additionalInfo', 'category', 'brand', 'sku', 'isActive', 'image', 'images']

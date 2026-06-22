@@ -1,4 +1,5 @@
 const Category = require('../models/Category')
+const { saveFile, deleteFile } = require('../utils/storage')
 
 // @desc    Get all categories
 // @route   GET /api/categories
@@ -20,9 +21,15 @@ const getCategories = async (req, res, next) => {
 const createCategory = async (req, res, next) => {
   try {
     const { name, description } = req.body
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image || ''
+    let image = req.body.image || ''
+    let imagePublicId = ''
+    if (req.file) {
+      const resFile = await saveFile(req.file)
+      image = resFile.url || ''
+      imagePublicId = resFile.public_id || ''
+    }
 
-    const category = await Category.create({ name, description, image })
+    const category = await Category.create({ name, description, image, imagePublicId })
     res.status(201).json({ success: true, message: 'Category created', category })
   } catch (error) {
     next(error)
@@ -35,7 +42,13 @@ const createCategory = async (req, res, next) => {
 const updateCategory = async (req, res, next) => {
   try {
     const updateData = { ...req.body }
-    if (req.file) updateData.image = `/uploads/${req.file.filename}`
+    if (req.file) {
+      const existing = await Category.findById(req.params.id)
+      try { await deleteFile(existing.imagePublicId || existing.image) } catch (e) {}
+      const resFile = await saveFile(req.file)
+      updateData.image = resFile.url || ''
+      if (resFile.public_id) updateData.imagePublicId = resFile.public_id
+    }
     if (typeof updateData.isActive === 'string') {
       updateData.isActive = updateData.isActive === 'true'
     }

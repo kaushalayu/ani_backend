@@ -30,6 +30,7 @@ const blogSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    imagePublicId: { type: String, default: '' },
     author: {
       type: String,
       default: 'Admin',

@@ -1,4 +1,5 @@
 const Blog = require('../models/Blog')
+const { saveFile, deleteFile } = require('../utils/storage')
 
 // @desc    Get all blogs (with filters & pagination)
 // @route   GET /api/blogs
@@ -72,8 +73,14 @@ const getBlog = async (req, res, next) => {
 // @access  Admin
 const createBlog = async (req, res, next) => {
   try {
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image || ''
-    const blogData = { ...req.body, image: imageUrl }
+    let imageUrl = req.body.image || ''
+    let imagePublicId = ''
+    if (req.file) {
+      const resFile = await saveFile(req.file)
+      imageUrl = resFile.url || ''
+      imagePublicId = resFile.public_id || ''
+    }
+    const blogData = { ...req.body, image: imageUrl, imagePublicId }
 
     if (typeof blogData.isPublished === 'string') {
       blogData.isPublished = blogData.isPublished === 'true'
@@ -95,7 +102,12 @@ const updateBlog = async (req, res, next) => {
     if (!blog) return res.status(404).json({ success: false, message: 'Blog not found' })
 
     const updateData = { ...req.body }
-    if (req.file) updateData.image = `/uploads/${req.file.filename}`
+    if (req.file) {
+      try { await deleteFile(blog.imagePublicId || blog.image) } catch (e) {}
+      const resFile = await saveFile(req.file)
+      updateData.image = resFile.url || ''
+      if (resFile.public_id) updateData.imagePublicId = resFile.public_id
+    }
     if (typeof updateData.isPublished === 'string') {
       updateData.isPublished = updateData.isPublished === 'true'
     }

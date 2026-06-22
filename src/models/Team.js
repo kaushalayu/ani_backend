@@ -19,6 +19,7 @@ const teamSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    imagePublicId: { type: String, default: '' },
     socialLinks: {
       facebook: { type: String, default: '' },
       instagram: { type: String, default: '' },
