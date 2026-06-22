@@ -13,7 +13,7 @@ const app = express()
 
 // ── Middleware ─────────────────────────────────────────
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(s => s.trim()) : []),
   'http://localhost:5173',
   'http://localhost:3000',
 ].filter(Boolean)
