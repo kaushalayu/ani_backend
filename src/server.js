@@ -19,12 +19,7 @@ const allowedOrigins = [
 ].filter(Boolean)
 
 app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true)
-    if (allowedOrigins.includes(origin)) return cb(null, true)
-    if (origin.startsWith('http://localhost:')) return cb(null, true)
-    cb(null, false)
-  },
+  origin: true,
   credentials: true,
 }))
 
