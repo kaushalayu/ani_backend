@@ -24,7 +24,7 @@ const saveFile = async (file) => {
   // If Cloudinary configured, upload and remove local file
   if (useCloud) {
     try {
-      const res = await cloudinary.uploader.upload(file.path, { folder: 'pharmez' })
+      const res = await cloudinary.uploader.upload(file.path, { folder: 'painomed' })
       try { fs.unlinkSync(file.path) } catch (e) {}
       return { url: res.secure_url || res.url || '', public_id: res.public_id || '' }
     } catch (err) {

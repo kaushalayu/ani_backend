@@ -56,7 +56,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // ── Health check ───────────────────────────────────────
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Pharmez API is running 🚀', env: process.env.NODE_ENV })
+  res.json({ success: true, message: 'Painomed API is running 🚀', env: process.env.NODE_ENV })
 })
 
 // ── 404 ────────────────────────────────────────────────

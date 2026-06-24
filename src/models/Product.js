@@ -44,7 +44,7 @@ const productSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      default: 'Pharmez Healthcare',
+      default: 'Painomed Healthcare',
     },
     sku: {
       type: String,

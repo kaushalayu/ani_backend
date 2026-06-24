@@ -9,7 +9,7 @@ const Service = require('../models/Service')
 const Team = require('../models/Team')
 const seedCategories = require('./seedCategories')
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@pharmez.com'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@painomed.com'
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'Admin@123Secure'
 const ADMIN_NAME = 'Admin'
 
@@ -712,7 +712,7 @@ const TESTIMONIALS = [
   {
     name: 'Sarah Johnson',
     role: 'Verified Customer',
-    text: 'Pharmez has been a lifesaver! The ordering process is so smooth and my medications arrive right on time every single time.',
+    text: 'Painomed has been a lifesaver! The ordering process is so smooth and my medications arrive right on time every single time.',
     rating: 5,
   },
   {
@@ -724,7 +724,7 @@ const TESTIMONIALS = [
   {
     name: 'Emily Rodriguez',
     role: 'Healthcare Professional',
-    text: 'As a nurse, I recommend Pharmez to my patients. Their prescription service is reliable and the delivery is always discreet and prompt.',
+    text: 'As a nurse, I recommend Painomed to my patients. Their prescription service is reliable and the delivery is always discreet and prompt.',
     rating: 5,
   },
   {
@@ -882,7 +882,7 @@ const seedAll = async () => {
           category: category._id,
           image: placeholderImages[productCount % placeholderImages.length],
           images: [],
-          brand: 'Pharmez Healthcare',
+          brand: 'Painomed Healthcare',
           sku: `PHM-${String(productCount + 1).padStart(4, '0')}`,
         })
         console.log(`✅ Product created: ${productName} [${category.name}]`)

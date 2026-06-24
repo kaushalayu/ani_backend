@@ -4,16 +4,16 @@ const path = require('path')
 const { saveFile, deleteFile } = require('../utils/storage')
 
 const getDefaultSeo = () => ({
-  siteTitle: 'Pharmez - Online Pharmacy',
-  siteDescription: 'Buy genuine medicines and healthcare products online at Pharmez. Fast delivery, best prices, and trusted quality.',
-  siteKeywords: 'pharmacy, online pharmacy, medicines, healthcare, pharmez',
+  siteTitle: 'Painomed - Online Pharmacy',
+  siteDescription: 'Buy genuine medicines and healthcare products online at Painomed. Fast delivery, best prices, and trusted quality.',
+  siteKeywords: 'pharmacy, online pharmacy, medicines, healthcare, painomed',
   siteIcon: '',
   ogImage: '',
   ogTitle: '',
   ogDescription: '',
   footerText: '',
   whatsappNumber: '61383766284',
-  supportEmail: 'support@pharmez.com',
+  supportEmail: 'support@painomed.com',
   contactPhone: '+61 3 8376 6284',
   address: '21 King Street, Melbourne, 3000, Australia',
   businessHours: 'Mon - Sat: 9:00 am to 6:00 pm',
