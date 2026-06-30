@@ -17,16 +17,17 @@ exports.getByPage = async (req, res, next) => {
 
 exports.upsert = async (req, res, next) => {
   try {
-    const { page, title, description, keywords, ogImage } = req.body
+    const { page, title, description, keywords, ogImage, aboutVideoUrl } = req.body
     let meta = await PageMeta.findOne({ page })
     if (meta) {
       if (title !== undefined) meta.title = title
       if (description !== undefined) meta.description = description
       if (keywords !== undefined) meta.keywords = keywords
       if (ogImage !== undefined) meta.ogImage = ogImage
+      if (aboutVideoUrl !== undefined) meta.aboutVideoUrl = aboutVideoUrl
       await meta.save()
     } else {
-      meta = await PageMeta.create({ page, title, description, keywords, ogImage })
+      meta = await PageMeta.create({ page, title, description, keywords, ogImage, aboutVideoUrl })
     }
     res.json({ success: true, data: meta })
   } catch (err) { next(err) }

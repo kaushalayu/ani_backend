@@ -8,6 +8,7 @@ const pageMetaSchema = new mongoose.Schema({
   ogImage: { type: String, default: '' },
   bannerImage: { type: String, default: '' },
   bannerImagePublicId: { type: String, default: '' },
+  aboutVideoUrl: { type: String, default: '' },
 }, { timestamps: true })
 
 module.exports = mongoose.model('PageMeta', pageMetaSchema)
