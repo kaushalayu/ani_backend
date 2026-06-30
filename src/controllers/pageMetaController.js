@@ -1,4 +1,5 @@
 const PageMeta = require('../models/PageMeta')
+const { saveFile, deleteFile } = require('../utils/storage')
 
 exports.getAll = async (req, res, next) => {
   try {
@@ -35,5 +36,29 @@ exports.remove = async (req, res, next) => {
   try {
     await PageMeta.findOneAndDelete({ page: req.params.page })
     res.json({ success: true, message: 'Deleted' })
+  } catch (err) { next(err) }
+}
+
+exports.uploadBanner = async (req, res, next) => {
+  try {
+    const { page } = req.body
+    if (!page) return res.status(400).json({ success: false, message: 'Page is required' })
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' })
+
+    const { url, public_id } = await saveFile(req.file)
+
+    let meta = await PageMeta.findOne({ page })
+    if (meta) {
+      if (meta.bannerImage) {
+        try { await deleteFile(meta.bannerImagePublicId || meta.bannerImage) } catch (e) {}
+      }
+      meta.bannerImage = url
+      meta.bannerImagePublicId = public_id || ''
+      await meta.save()
+    } else {
+      meta = await PageMeta.create({ page, bannerImage: url, bannerImagePublicId: public_id || '' })
+    }
+
+    res.json({ success: true, data: { bannerImage: meta.bannerImage } })
   } catch (err) { next(err) }
 }

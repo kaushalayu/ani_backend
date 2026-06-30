@@ -87,4 +87,54 @@ const deleteUser = async (req, res, next) => {
   }
 }
 
-module.exports = { getAllUsers, getUser, updateUser, deleteUser }
+// @desc    Fix stored image URLs (localhost -> relative)
+// @route   POST /api/admin/fix-image-urls
+// @access  Admin
+const fixImageUrls = async (req, res, next) => {
+  try {
+    const Product = require('../models/Product')
+    const PageMeta = require('../models/PageMeta')
+    const oldHost = 'http://localhost:5000'
+    let totalFixed = 0
+
+    // Fix Product images
+    const products = await Product.find({
+      $or: [
+        { image: { $regex: oldHost } },
+        { 'pillsOptions.image': { $regex: oldHost } },
+      ]
+    })
+    for (const p of products) {
+      if (p.image && p.image.startsWith(oldHost)) {
+        p.image = p.image.replace(oldHost, '')
+        totalFixed++
+      }
+      if (p.images && Array.isArray(p.images)) {
+        p.images = p.images.map(img => img.startsWith(oldHost) ? (totalFixed++, img.replace(oldHost, '')) : img)
+      }
+      if (p.pillsOptions && Array.isArray(p.pillsOptions)) {
+        for (const opt of p.pillsOptions) {
+          if (opt.image && opt.image.startsWith(oldHost)) {
+            opt.image = opt.image.replace(oldHost, '')
+            totalFixed++
+          }
+        }
+      }
+      await p.save()
+    }
+
+    // Fix PageMeta banner images
+    const pageMetas = await PageMeta.find({ bannerImage: { $regex: oldHost } })
+    for (const pm of pageMetas) {
+      pm.bannerImage = pm.bannerImage.replace(oldHost, '')
+      totalFixed++
+      await pm.save()
+    }
+
+    res.json({ success: true, message: `Fixed ${totalFixed} image URL(s)` })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { getAllUsers, getUser, updateUser, deleteUser, fixImageUrls }

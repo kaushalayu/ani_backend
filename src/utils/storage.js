@@ -13,12 +13,6 @@ try {
   // cloudinary not installed — fall back to local storage
 }
 
-const getLocalBase = () => {
-  if (process.env.BACKEND_URL) return process.env.BACKEND_URL.replace(/\/$/, '')
-  const port = process.env.PORT || 5000
-  return `http://localhost:${port}`
-}
-
 const saveFile = async (file) => {
   if (!file) return { url: '', public_id: '' }
   // If Cloudinary configured, upload and remove local file
@@ -28,12 +22,12 @@ const saveFile = async (file) => {
       try { fs.unlinkSync(file.path) } catch (e) {}
       return { url: res.secure_url || res.url || '', public_id: res.public_id || '' }
     } catch (err) {
-      return { url: `${getLocalBase()}/uploads/${file.filename}`, public_id: '' }
+      return { url: `/uploads/${file.filename}`, public_id: '' }
     }
   }
 
-  // Default: return absolute URL to local uploads so frontend can fetch after redeploys when using a stable backend
-  return { url: `${getLocalBase()}/uploads/${file.filename}`, public_id: '' }
+  // Store relative path — frontend prepends NEXT_PUBLIC_API_URL
+  return { url: `/uploads/${file.filename}`, public_id: '' }
 }
 
 const deleteFile = async (info) => {
