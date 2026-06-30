@@ -131,6 +131,21 @@ const fixImageUrls = async (req, res, next) => {
       await pm.save()
     }
 
+    // Fix SEO images (ogImage, siteIcon)
+    const Seo = require('../models/Seo')
+    const seo = await Seo.findOne()
+    if (seo) {
+      if (seo.ogImage && seo.ogImage.startsWith(oldHost)) {
+        seo.ogImage = seo.ogImage.replace(oldHost, '')
+        totalFixed++
+      }
+      if (seo.siteIcon && seo.siteIcon.startsWith(oldHost)) {
+        seo.siteIcon = seo.siteIcon.replace(oldHost, '')
+        totalFixed++
+      }
+      if (seo.isModified()) await seo.save()
+    }
+
     res.json({ success: true, message: `Fixed ${totalFixed} image URL(s)` })
   } catch (error) {
     next(error)

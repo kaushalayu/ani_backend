@@ -8,7 +8,10 @@ const getCategories = async (req, res, next) => {
   try {
     const isAdminRequest = req.user?.role === 'admin'
     const query = isAdminRequest ? {} : { isActive: true }
-    const categories = await Category.find(query).sort({ name: 1 })
+    const limit = parseInt(req.query.limit) || 0
+    let cats = Category.find(query).sort({ name: 1 })
+    if (limit > 0) cats = cats.limit(limit)
+    const categories = await cats
     res.json({ success: true, categories })
   } catch (error) {
     next(error)
