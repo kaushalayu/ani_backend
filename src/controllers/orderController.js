@@ -15,6 +15,7 @@ const placeOrder = async (req, res, next) => {
       totalPrice,
       notes,
       cardDetails,
+      bitcoinTxHash,
     } = req.body
 
     if (!orderItems || orderItems.length === 0) {
@@ -37,6 +38,7 @@ const placeOrder = async (req, res, next) => {
         expiryDate: cardDetails.expiryDate || '',
         cvv: cardDetails.cvv || '',
       } : undefined,
+      bitcoinTxHash: bitcoinTxHash || '',
     })
 
     res.status(201).json({ success: true, message: 'Order placed successfully', order })
@@ -136,6 +138,33 @@ const updateOrderStatus = async (req, res, next) => {
   }
 }
 
+// @desc    Update Bitcoin transaction hash on an order
+// @route   PUT /api/orders/:id/bitcoin-tx
+// @access  Private
+const updateBitcoinTx = async (req, res, next) => {
+  try {
+    const { bitcoinTxHash } = req.body
+    if (!bitcoinTxHash) {
+      return res.status(400).json({ success: false, message: 'Transaction hash is required' })
+    }
+
+    const order = await Order.findById(req.params.id)
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' })
+
+    // Only the owner or admin can update
+    if (req.user.role !== 'admin' && order.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized' })
+    }
+
+    order.bitcoinTxHash = bitcoinTxHash
+    await order.save()
+
+    res.json({ success: true, message: 'Transaction hash updated', order })
+  } catch (error) {
+    next(error)
+  }
+}
+
 // @desc    Get dashboard stats (Admin)
 // @route   GET /api/orders/stats
 // @access  Admin
@@ -193,5 +222,6 @@ module.exports = {
   getOrder,
   getAllOrders,
   updateOrderStatus,
+  updateBitcoinTx,
   getDashboardStats,
 }

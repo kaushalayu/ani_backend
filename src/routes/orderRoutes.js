@@ -6,6 +6,7 @@ const {
   getOrder,
   getAllOrders,
   updateOrderStatus,
+  updateBitcoinTx,
 } = require('../controllers/orderController')
 const { protect, adminOnly } = require('../middleware/auth')
 
@@ -13,6 +14,7 @@ const { protect, adminOnly } = require('../middleware/auth')
 router.post('/', protect, placeOrder)
 router.get('/my', protect, getMyOrders)
 router.get('/:id', protect, getOrder)
+router.put('/:id/bitcoin-tx', protect, updateBitcoinTx)
 
 // Admin
 router.get('/', protect, adminOnly, getAllOrders)

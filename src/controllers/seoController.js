@@ -142,4 +142,41 @@ const uploadOgImage = async (req, res, next) => {
   }
 }
 
-module.exports = { getSeo, updateSeo, uploadIcon, uploadOgImage }
+// @desc    Upload a promotion banner image (admin only)
+// @route   POST /api/admin/seo/upload-promo-banner/:index
+// @access  Admin
+const uploadPromoBanner = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' })
+    }
+
+    const index = req.params.index
+    if (!['1', '2', '3'].includes(index)) {
+      return res.status(400).json({ success: false, message: 'Invalid banner index (1, 2, or 3)' })
+    }
+
+    const urlField = `promoBanner${index}`
+    const publicIdField = `promoBanner${index}PublicId`
+
+    let seo = await Seo.findOne()
+    if (!seo) {
+      seo = new Seo()
+    }
+
+    if (seo[urlField] || seo[publicIdField]) {
+      try { await deleteFile(seo[publicIdField] || seo[urlField]) } catch (e) {}
+    }
+
+    const result = await saveFile(req.file)
+    seo[urlField] = result.url || ''
+    seo[publicIdField] = result.public_id || ''
+    await seo.save()
+
+    res.json({ success: true, message: `Promo banner ${index} uploaded`, seo })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { getSeo, updateSeo, uploadIcon, uploadOgImage, uploadPromoBanner }

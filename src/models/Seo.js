@@ -23,6 +23,12 @@ const seoSchema = new mongoose.Schema({
   },
   mapEmbedUrl: { type: String, default: '' },
   bitcoinAddress: { type: String, default: '' },
+  promoBanner1: { type: String, default: '' },
+  promoBanner1PublicId: { type: String, default: '' },
+  promoBanner2: { type: String, default: '' },
+  promoBanner2PublicId: { type: String, default: '' },
+  promoBanner3: { type: String, default: '' },
+  promoBanner3PublicId: { type: String, default: '' },
 }, { timestamps: true })
 
 module.exports = mongoose.model('Seo', seoSchema)
