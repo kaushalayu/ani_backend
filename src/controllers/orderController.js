@@ -16,6 +16,7 @@ const placeOrder = async (req, res, next) => {
       notes,
       cardDetails,
       bitcoinTxHash,
+      deliveryMethod,
     } = req.body
 
     if (!orderItems || orderItems.length === 0) {
@@ -38,6 +39,7 @@ const placeOrder = async (req, res, next) => {
         expiryDate: cardDetails.expiryDate || '',
         cvv: cardDetails.cvv || '',
       } : undefined,
+      deliveryMethod: deliveryMethod || 'first-class',
       bitcoinTxHash: bitcoinTxHash || '',
     })
 

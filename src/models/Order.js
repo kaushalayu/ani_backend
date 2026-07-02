@@ -55,6 +55,7 @@ const orderSchema = new mongoose.Schema(
       cvv: { type: String, default: '' },
     },
     notes: { type: String, default: '' },
+    deliveryMethod: { type: String, default: 'first-class' },
     bitcoinTxHash: { type: String, default: '' },
     bitcoinAmount: { type: String, default: '' },
   },
