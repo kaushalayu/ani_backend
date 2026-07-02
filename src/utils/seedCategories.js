@@ -33,14 +33,14 @@ const DEFAULT_CATEGORIES = [
 
 const seedCategories = async () => {
   try {
+    const count = await Category.countDocuments()
+    if (count > 0) {
+      console.log(`ℹ️  ${count} categories already exist — skipping seed`)
+      return
+    }
     for (const cat of DEFAULT_CATEGORIES) {
-      const exists = await Category.findOne({
-        name: { $regex: new RegExp(`^${cat.name}$`, 'i') }
-      })
-      if (!exists) {
-        await Category.create(cat)
-        console.log(`✅ Category seeded: ${cat.name}`)
-      }
+      await Category.create(cat)
+      console.log(`✅ Category seeded: ${cat.name}`)
     }
   } catch (err) {
     console.error('⚠️  Category seeding error:', err.message)

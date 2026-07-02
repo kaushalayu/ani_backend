@@ -1,4 +1,5 @@
 const Category = require('../models/Category')
+const Product = require('../models/Product')
 const { saveFile, deleteFile } = require('../utils/storage')
 
 // @desc    Get all categories
@@ -24,6 +25,10 @@ const getCategories = async (req, res, next) => {
 const createCategory = async (req, res, next) => {
   try {
     const { name, description } = req.body
+    let isActive = req.body.isActive
+    if (typeof isActive === 'string') {
+      isActive = isActive === 'true'
+    }
     let image = req.body.image || ''
     let imagePublicId = ''
     if (req.file) {
@@ -32,7 +37,7 @@ const createCategory = async (req, res, next) => {
       imagePublicId = resFile.public_id || ''
     }
 
-    const category = await Category.create({ name, description, image, imagePublicId })
+    const category = await Category.create({ name, description, isActive, image, imagePublicId })
     res.status(201).json({ success: true, message: 'Category created', category })
   } catch (error) {
     next(error)
@@ -77,7 +82,13 @@ const deleteCategory = async (req, res, next) => {
     const category = await Category.findByIdAndDelete(req.params.id)
     if (!category) return res.status(404).json({ success: false, message: 'Category not found' })
 
-    res.json({ success: true, message: 'Category deleted' })
+    // Remove category reference from all products that used it
+    await Product.updateMany(
+      { category: req.params.id },
+      { $unset: { category: '' } }
+    )
+
+    res.json({ success: true, message: 'Category deleted and removed from products' })
   } catch (error) {
     next(error)
   }
