@@ -145,6 +145,9 @@ const createProduct = async (req, res, next) => {
     if (typeof filteredData.isBestSeller === 'string') {
       filteredData.isBestSeller = filteredData.isBestSeller === 'true'
     }
+    if (typeof filteredData.isActive === 'string') {
+      filteredData.isActive = filteredData.isActive === 'true'
+    }
 
     const product = await Product.create(filteredData)
     const populated = await product.populate('category', 'name slug')
