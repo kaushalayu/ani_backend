@@ -5,8 +5,16 @@ let useCloud = false
 
 try {
   cloudinary = require('cloudinary').v2
-  if (process.env.CLOUDINARY_URL || (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY)) {
-    cloudinary.config({ secure: true })
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+  const apiKey = process.env.CLOUDINARY_API_KEY
+  const apiSecret = process.env.CLOUDINARY_API_SECRET
+  if (process.env.CLOUDINARY_URL || (cloudName && apiKey)) {
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    })
     useCloud = true
   }
 } catch (err) {
