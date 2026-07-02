@@ -218,6 +218,20 @@ const getDashboardStats = async (req, res, next) => {
   }
 }
 
+// @desc    Delete an order (Admin)
+// @route   DELETE /api/orders/:id
+// @access  Admin
+const deleteOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id)
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' })
+    await Order.findByIdAndDelete(req.params.id)
+    res.json({ success: true, message: 'Order deleted successfully' })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   placeOrder,
   getMyOrders,
@@ -226,4 +240,5 @@ module.exports = {
   updateOrderStatus,
   updateBitcoinTx,
   getDashboardStats,
+  deleteOrder,
 }

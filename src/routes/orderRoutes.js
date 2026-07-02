@@ -7,6 +7,7 @@ const {
   getAllOrders,
   updateOrderStatus,
   updateBitcoinTx,
+  deleteOrder,
 } = require('../controllers/orderController')
 const { protect, adminOnly } = require('../middleware/auth')
 
@@ -20,5 +21,6 @@ router.put('/:id/bitcoin-tx', protect, updateBitcoinTx)
 router.get('/', protect, adminOnly, getAllOrders)
 // Note: /admin/stats is in adminRoutes.js — this duplicate is removed
 router.put('/:id/status', protect, adminOnly, updateOrderStatus)
+router.delete('/:id', protect, adminOnly, deleteOrder)
 
 module.exports = router
