@@ -49,7 +49,7 @@ const updateSeo = async (req, res, next) => {
     const {
       siteTitle, siteDescription, siteKeywords, ogTitle, ogDescription, footerText,
       whatsappNumber, supportEmail, contactPhone, address, businessHours,
-      socialLinks, mapEmbedUrl, bitcoinAddress,
+      socialLinks, mapEmbedUrl, bitcoinAddress, bitcoinQrCode,
     } = req.body
 
     let seo = await Seo.findOne()
@@ -70,6 +70,7 @@ const updateSeo = async (req, res, next) => {
     if (businessHours !== undefined) seo.businessHours = businessHours
     if (mapEmbedUrl !== undefined) seo.mapEmbedUrl = mapEmbedUrl
     if (bitcoinAddress !== undefined) seo.bitcoinAddress = bitcoinAddress
+    if (bitcoinQrCode !== undefined) seo.bitcoinQrCode = bitcoinQrCode
     if (socialLinks !== undefined) {
       if (socialLinks.facebook !== undefined) seo.socialLinks.facebook = socialLinks.facebook
       if (socialLinks.instagram !== undefined) seo.socialLinks.instagram = socialLinks.instagram
@@ -179,4 +180,33 @@ const uploadPromoBanner = async (req, res, next) => {
   }
 }
 
-module.exports = { getSeo, updateSeo, uploadIcon, uploadOgImage, uploadPromoBanner }
+// @desc    Upload Bitcoin QR code image (admin only)
+// @route   POST /api/admin/seo/upload-bitcoin-qr
+// @access  Admin
+const uploadBitcoinQr = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' })
+    }
+
+    let seo = await Seo.findOne()
+    if (!seo) {
+      seo = new Seo()
+    }
+
+    if (seo.bitcoinQrCode || seo.bitcoinQrCodePublicId) {
+      try { await deleteFile(seo.bitcoinQrCodePublicId || seo.bitcoinQrCode) } catch (e) {}
+    }
+
+    const result = await saveFile(req.file)
+    seo.bitcoinQrCode = result.url || ''
+    seo.bitcoinQrCodePublicId = result.public_id || ''
+    await seo.save()
+
+    res.json({ success: true, message: 'Bitcoin QR code uploaded', seo })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { getSeo, updateSeo, uploadIcon, uploadOgImage, uploadPromoBanner, uploadBitcoinQr }

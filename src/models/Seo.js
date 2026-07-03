@@ -23,6 +23,8 @@ const seoSchema = new mongoose.Schema({
   },
   mapEmbedUrl: { type: String, default: '' },
   bitcoinAddress: { type: String, default: '' },
+  bitcoinQrCode: { type: String, default: '' },
+  bitcoinQrCodePublicId: { type: String, default: '' },
   promoBanner1: { type: String, default: '' },
   promoBanner1PublicId: { type: String, default: '' },
   promoBanner2: { type: String, default: '' },

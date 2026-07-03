@@ -23,6 +23,16 @@ const placeOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No order items' })
     }
 
+    if (paymentMethod === 'bitcoin' && (!bitcoinTxHash || !bitcoinTxHash.trim())) {
+      return res.status(400).json({ success: false, message: 'Bitcoin transaction hash is required for crypto payments' })
+    }
+
+    if (paymentMethod === 'card') {
+      if (!cardDetails || !cardDetails.nameOnCard || !cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv) {
+        return res.status(400).json({ success: false, message: 'All card details (name, number, expiry, CVV) are required' })
+      }
+    }
+
     const order = await Order.create({
       user: req.user._id,
       orderItems,
