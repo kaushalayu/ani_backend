@@ -16,6 +16,8 @@ const allowedOrigins = [
   ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(s => s.trim()) : []),
   'http://localhost:5173',
   'http://localhost:3000',
+  'https://painomed.us',
+  'https://www.painomed.us',
 ].filter(Boolean)
 
 app.use(cors({
