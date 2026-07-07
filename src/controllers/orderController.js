@@ -34,7 +34,6 @@ const placeOrder = async (req, res, next) => {
     }
 
     const order = await Order.create({
-      user: req.user._id,
       orderItems,
       shippingAddress,
       paymentMethod: paymentMethod || 'whatsapp',
@@ -59,12 +58,17 @@ const placeOrder = async (req, res, next) => {
   }
 }
 
-// @desc    Get logged-in user's orders
-// @route   GET /api/orders/my
-// @access  Private
+// @desc    Get orders by email (no auth required)
+// @route   GET /api/orders/my?email=xxx
+// @access  Public
 const getMyOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({ user: req.user._id })
+    const { email } = req.query
+    let filter = {}
+    if (email) {
+      filter['shippingAddress.email'] = email
+    }
+    const orders = await Order.find(filter)
       .populate('orderItems.product', 'name image')
       .sort({ createdAt: -1 })
 
@@ -76,22 +80,13 @@ const getMyOrders = async (req, res, next) => {
 
 // @desc    Get single order
 // @route   GET /api/orders/:id
-// @access  Private
+// @access  Public
 const getOrder = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate('user', 'name email')
       .populate('orderItems.product', 'name image')
 
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' })
-
-    // Users can only see their own orders; admins see all
-    if (
-      req.user.role !== 'admin' &&
-      order.user._id.toString() !== req.user._id.toString()
-    ) {
-      return res.status(403).json({ success: false, message: 'Not authorized' })
-    }
 
     res.json({ success: true, order })
   } catch (error) {
@@ -162,11 +157,6 @@ const updateBitcoinTx = async (req, res, next) => {
 
     const order = await Order.findById(req.params.id)
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' })
-
-    // Only the owner or admin can update
-    if (req.user.role !== 'admin' && order.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Not authorized' })
-    }
 
     order.bitcoinTxHash = bitcoinTxHash
     await order.save()

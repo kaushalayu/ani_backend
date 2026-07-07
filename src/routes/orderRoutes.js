@@ -11,11 +11,11 @@ const {
 } = require('../controllers/orderController')
 const { protect, adminOnly } = require('../middleware/auth')
 
-// Private
-router.post('/', protect, placeOrder)
-router.get('/my', protect, getMyOrders)
-router.get('/:id', protect, getOrder)
-router.put('/:id/bitcoin-tx', protect, updateBitcoinTx)
+// Public (no auth required for customer order endpoints)
+router.post('/', placeOrder)
+router.get('/my', getMyOrders)
+router.get('/:id', getOrder)
+router.put('/:id/bitcoin-tx', updateBitcoinTx)
 
 // Admin
 router.get('/', protect, adminOnly, getAllOrders)
