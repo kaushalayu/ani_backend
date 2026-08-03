@@ -49,6 +49,7 @@ app.use('/api/team',         require('./routes/teamRoutes'))
 app.use('/api/services',     require('./routes/serviceRoutes'))
 app.use('/api/admin',        require('./routes/adminRoutes'))
 app.use('/api/newsletter',   require('./routes/newsletterRoutes'))
+app.use('/api/leads',        require('./routes/leadRoutes'))
 app.use('/api/page-meta',    require('./routes/pageMetaRoutes'))
 
 // Debug routes — development only (NEVER in production)

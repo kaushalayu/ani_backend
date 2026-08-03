@@ -1,4 +1,5 @@
 const Order = require('../models/Order')
+const { notifyNewOrder } = require('../utils/mailer')
 
 // @desc    Place a new order
 // @route   POST /api/orders
@@ -53,6 +54,8 @@ const placeOrder = async (req, res, next) => {
     })
 
     res.status(201).json({ success: true, message: 'Order placed successfully', order })
+
+    notifyNewOrder(order)
   } catch (error) {
     next(error)
   }
