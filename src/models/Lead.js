@@ -22,6 +22,18 @@ const leadSchema = new mongoose.Schema(
       type: String,
       default: 'popup',
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+    isStarred: {
+      type: Boolean,
+      default: false,
+    },
+    notes: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 )
