@@ -4,18 +4,18 @@ const path = require('path')
 const { saveFile, deleteFile } = require('../utils/storage')
 
 const getDefaultSeo = () => ({
-  siteTitle: 'Painomed - Online Pharmacy',
-  siteDescription: 'Buy genuine medicines and healthcare products online at Painomed. Fast delivery, best prices, and trusted quality.',
-  siteKeywords: 'pharmacy, online pharmacy, medicines, healthcare, painomed',
+  siteTitle: 'Painomed - Online Pharmacy | Pain Relief & Anxiety Medicine Online in USA',
+  siteDescription: 'Buy pain relief, anxiety and sleep medicines online in the USA. No prescription required. Fast, discreet delivery from Painomed — your trusted online pharmacy.',
+  siteKeywords: 'online pharmacy usa, pain relief medicine online, anxiety medicine online, sleeping pills online, no prescription required, painomed',
   siteIcon: '',
   ogImage: '',
   ogTitle: '',
   ogDescription: '',
   footerText: '',
-  whatsappNumber: '61383766284',
+  whatsappNumber: '12125550134',
   supportEmail: 'support@painomed.com',
-  contactPhone: '+61 3 8376 6284',
-  address: '21 King Street, Melbourne, 3000, Australia',
+  contactPhone: '+1 212 555 0134',
+  address: '350 5th Avenue, New York, NY 10118, United States',
   businessHours: 'Mon - Sat: 9:00 am to 6:00 pm',
   socialLinks: {
     facebook: 'https://www.facebook.com/',

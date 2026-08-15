@@ -1,4 +1,5 @@
 const Contact = require('../models/Contact')
+const { notifyNewContact } = require('../utils/mailer')
 
 const submitContact = async (req, res, next) => {
   try {
@@ -11,6 +12,8 @@ const submitContact = async (req, res, next) => {
     const contact = await Contact.create({ name, email, phone, subject, subjectOther, message })
 
     res.status(201).json({ success: true, message: 'Message sent successfully', contact })
+
+    notifyNewContact(contact)
   } catch (error) {
     next(error)
   }

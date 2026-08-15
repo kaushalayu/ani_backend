@@ -51,6 +51,7 @@ app.use('/api/admin',        require('./routes/adminRoutes'))
 app.use('/api/newsletter',   require('./routes/newsletterRoutes'))
 app.use('/api/leads',        require('./routes/leadRoutes'))
 app.use('/api/page-meta',    require('./routes/pageMetaRoutes'))
+app.use('/api/settings',     require('./routes/settingsRoutes'))
 
 // Debug routes — development only (NEVER in production)
 if (process.env.NODE_ENV === 'development') {

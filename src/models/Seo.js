@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 const seoSchema = new mongoose.Schema({
-  siteTitle: { type: String, default: 'Painomed - Online Pharmacy' },
-  siteDescription: { type: String, default: 'Buy genuine medicines and healthcare products online at Painomed. Fast delivery, best prices, and trusted quality.' },
-  siteKeywords: { type: String, default: 'pharmacy, online pharmacy, medicines, healthcare, painomed' },
+  siteTitle: { type: String, default: 'Painomed - Online Pharmacy | Pain Relief & Anxiety Medicine Online in USA' },
+  siteDescription: { type: String, default: 'Buy pain relief, anxiety and sleep medicines online in the USA. No prescription required. Fast, discreet delivery from Painomed — your trusted online pharmacy.' },
+  siteKeywords: { type: String, default: 'online pharmacy usa, pain relief medicine online, anxiety medicine online, sleeping pills online, no prescription required, painomed' },
   siteIcon: { type: String, default: '' },
   siteIconPublicId: { type: String, default: '' },
   ogImage: { type: String, default: '' },
@@ -11,10 +11,10 @@ const seoSchema = new mongoose.Schema({
   ogTitle: { type: String, default: '' },
   ogDescription: { type: String, default: '' },
   footerText: { type: String, default: '' },
-  whatsappNumber: { type: String, default: '61383766284' },
+  whatsappNumber: { type: String, default: '12125550134' },
   supportEmail: { type: String, default: 'support@painomed.com' },
-  contactPhone: { type: String, default: '+61 3 8376 6284' },
-  address: { type: String, default: '21 King Street, Melbourne, 3000, Australia' },
+  contactPhone: { type: String, default: '+1 212 555 0134' },
+  address: { type: String, default: '350 5th Avenue, New York, NY 10118, United States' },
   businessHours: { type: String, default: 'Mon - Sat: 9:00 am to 6:00 pm' },
   socialLinks: {
     facebook: { type: String, default: 'https://www.facebook.com/' },

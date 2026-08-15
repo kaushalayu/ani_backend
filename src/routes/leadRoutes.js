@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Lead = require('../models/Lead')
+const { notifyNewLead } = require('../utils/mailer')
 const { protect, adminOnly } = require('../middleware/auth')
 
 router.post('/', async (req, res, next) => {
@@ -10,8 +11,10 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Name and mobile number are required' })
     }
 
-    await Lead.create({ name, mobile, email, source })
+    const lead = await Lead.create({ name, mobile, email, source })
     res.status(201).json({ success: true, message: 'Thank you! We will contact you soon.' })
+
+    notifyNewLead(lead)
   } catch (error) {
     next(error)
   }
